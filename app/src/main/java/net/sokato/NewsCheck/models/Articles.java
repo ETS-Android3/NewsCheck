@@ -9,7 +9,7 @@ public class Articles {
 
     @SerializedName("source")
     @Expose
-    private Source source;
+    private net.sokato.NewsCheck.models.Source source;
 
     @SerializedName("author")
     @Expose
@@ -35,11 +35,11 @@ public class Articles {
     @Expose
     private String publishedAt;
 
-    public Source getSource() {
+    public net.sokato.NewsCheck.models.Source getSource() {
         return source;
     }
 
-    public void setSource(Source source) {
+    public void setSource(net.sokato.NewsCheck.models.Source source) {
         this.source = source;
     }
 
