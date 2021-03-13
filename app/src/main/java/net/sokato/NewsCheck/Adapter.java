@@ -1,6 +1,7 @@
 package net.sokato.NewsCheck;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,17 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 
 import net.sokato.NewsCheck.models.Articles;
 
@@ -40,11 +49,39 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         final MyViewHolder holder = holders;
         Articles model = articles.get(position);
         RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(Utils.getRandomDrawableColor());
+        requestOptions.error(Utils.getRandomDrawableColor());
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
+        requestOptions.centerCrop();
+
+        Glide.with(context).load(model.getUrlToImage())
+                .apply(requestOptions)
+                .listener(new RequestListener<Drawable>() {
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        holder.progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(holder.imageView);
+        holder.title.setText(model.getTitle());
+        holder.description.setText(model.getDescription());
+        holder.author.setText(model.getAuthor());
+        holder.source.setText(model.getSource().getName());
+        holder.time.setText(" \u2022 " + Utils.DateToTimeFormat(model.getPublishedAt()));
+        holder.publicationDate.setText(Utils.DateFormat(model.getPublishedAt()));
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return articles.size();
     }
 
     public void setOnItemClickListener(OnItemClickListener onItemClickListener){
