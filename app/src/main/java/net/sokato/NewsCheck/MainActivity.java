@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView.setAdapter(adapter);
                     adapter.notifyDataSetChanged();
                 }else{
-                    Toast.makeText(MainActivity.this, R.string.noResult, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, R.string.noResult, Toast.LENGTH_LONG).show();
                 }
             }
 
