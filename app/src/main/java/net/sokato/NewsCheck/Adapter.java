@@ -1,6 +1,7 @@
 package net.sokato.NewsCheck;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         onItemClickListener = new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Toast.makeText(context, "Test", Toast.LENGTH_LONG).show();
+                Articles article = articles.get(position);
+                Intent intent = new Intent(context, WebView.class);
+                intent.putExtra("URL", article.getUrl());
+                context.startActivity(intent);
             }
         };
         return new MyViewHolder(view, onItemClickListener);
