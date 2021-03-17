@@ -99,6 +99,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         this.onItemClickListener = onItemClickListener;
     }
 
+    public void addItems(List<Articles> articles){
+        this.articles.addAll(articles);
+    }
+
     public interface OnItemClickListener{
         void onItemClick(View view, int position);
     }

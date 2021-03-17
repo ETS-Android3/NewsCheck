@@ -24,6 +24,7 @@ import retrofit2.Response;
 public class MainActivity extends AppCompatActivity {
 
     public String API_KEY;
+    private int page = 1;
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private List<Articles> articles = new ArrayList<>();
@@ -48,32 +49,30 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1) && newState==RecyclerView.SCROLL_STATE_IDLE) {
                     Toast.makeText(MainActivity.this, "End Reached", Toast.LENGTH_LONG).show();
-                    Log.e("aaaaa","end");
+                    loadJson();
                 }
             }
         });
 
+        adapter = new Adapter(articles, MainActivity.this);
         loadJson();
+        recyclerView.setAdapter(adapter); //The first time, we set the adapter
+        adapter.notifyDataSetChanged();   //Later on, only the data set will be updated
 
     }
 
     public void loadJson(){
         ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
         Call<News> call;
-        call = apiInterface.getNews(Utils.getCountry(), API_KEY);
+        call = apiInterface.getNews(Utils.getCountry(), API_KEY, page);
 
         call.enqueue(new Callback<News>() {
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
                 if(response.isSuccessful() && response.body().getArticles() != null){
-                    if(!articles.isEmpty()){
-                        articles.clear();
-                    }
-
-                    articles = response.body().getArticles();
-                    adapter = new Adapter(articles, MainActivity.this);
-                    recyclerView.setAdapter(adapter);
+                    adapter.addItems(response.body().getArticles());
                     adapter.notifyDataSetChanged();
+                    page++;
                 }else{
                     Toast.makeText(MainActivity.this, R.string.noResult, Toast.LENGTH_LONG).show();
                 }
