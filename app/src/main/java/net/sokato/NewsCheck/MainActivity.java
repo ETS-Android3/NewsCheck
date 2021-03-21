@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
                 if (!recyclerView.canScrollVertically(1) && newState==RecyclerView.SCROLL_STATE_IDLE) {
-                    Toast.makeText(MainActivity.this, "End Reached", Toast.LENGTH_LONG).show();
                     loadJson();
                 }
             }
