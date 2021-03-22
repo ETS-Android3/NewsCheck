@@ -9,6 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import net.sokato.NewsCheck.api.ApiClient;
 import net.sokato.NewsCheck.api.ApiInterface;
 import net.sokato.NewsCheck.models.Articles;
@@ -31,11 +34,15 @@ public class MainActivity extends AppCompatActivity {
     private Adapter adapter;
     private String TAG = MainActivity.class.getSimpleName();
 
+    private FirebaseFirestore db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         API_KEY = getResources().getString(R.string.API_KEY);
+
+        db = FirebaseFirestore.getInstance();
 
         recyclerView = findViewById(R.id.RecyclerView);
         layoutManager = new LinearLayoutManager(MainActivity.this);
