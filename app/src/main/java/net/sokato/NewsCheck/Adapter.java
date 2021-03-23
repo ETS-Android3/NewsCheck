@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -88,6 +89,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         holder.source.setText(model.getSource().getName());
         holder.time.setText(" \u2022 " + Utils.DateToTimeFormat(model.getPublishedAt()));
         holder.publicationDate.setText(Utils.DateFormat(model.getPublishedAt()));
+        holder.ratingBar.setRating(model.getRating());
     }
 
     @Override
@@ -100,6 +102,11 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     }
 
     public void addItems(List<Articles> articles){
+        for(Articles article : articles){
+
+            article.setRating(2.5f);  //TODO : fetch the rating from the server
+
+        }
         this.articles.addAll(articles);
     }
 
@@ -111,6 +118,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
         TextView title, author, description, publicationDate, source, time;
         ImageView imageView;
+        RatingBar ratingBar;
         ProgressBar progressBar;
         OnItemClickListener onItemClickListener;
 
@@ -125,6 +133,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
             time = itemView.findViewById(R.id.time);
             imageView = itemView.findViewById(R.id.img);
             progressBar = itemView.findViewById(R.id.photo_loading);
+            ratingBar = itemView.findViewById(R.id.rating);
             this.onItemClickListener = onItemClickListener;
 
         }

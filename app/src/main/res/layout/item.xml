@@ -139,6 +139,7 @@
                 tools:ignore="HardcodedText" />
 
             <RatingBar
+                android:id="@+id/rating"
                 android:numStars="5"
                 android:layout_alignParentEnd="true"
                 style="@style/Widget.AppCompat.RatingBar.Small"

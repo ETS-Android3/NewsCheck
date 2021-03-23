@@ -35,6 +35,18 @@ public class Articles {
     @Expose
     private String publishedAt;
 
+    @SerializedName("rating")
+    @Expose
+    private float rating;
+
+    public float getRating() {
+        return rating;
+    }
+
+    public void setRating(float rating) {
+        this.rating = rating;
+    }
+
     public net.sokato.NewsCheck.models.Source getSource() {
         return source;
     }
