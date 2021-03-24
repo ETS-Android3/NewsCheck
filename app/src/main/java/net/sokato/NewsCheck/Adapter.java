@@ -40,6 +40,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     private Context context;
     private OnItemClickListener onItemClickListener;
 
+    DocumentReference docRef;
+    DocumentSnapshot document;
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();;
 
     public Adapter(List<Articles> articles, Context context) {
@@ -99,12 +102,27 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
         Log.e("URL :", model.getUrl());
 
-        if(model.getRating() == -1f){
-            holder.ratingBar.setVisibility(View.INVISIBLE);
-        }else {
-            holder.ratingBar.setVisibility(View.VISIBLE);
-            holder.ratingBar.setRating(model.getRating());
-        }
+        docRef = db.collection("Articles").document(model.getUrl().replace("/", ""));
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    document = task.getResult();
+                    if(document != null && document.exists()) {
+                        model.setRating((float)(double)document.get("rating")); //Because double != Double
+                        Log.e("aaaa: ", Float.toString(model.getRating()));
+                        holder.ratingBar.setVisibility(View.VISIBLE);   //Done here because otherwise it could start
+                        holder.ratingBar.setRating(model.getRating());  //to display before the value was loaded
+                    }else{
+                        model.setRating(-1f);
+                        holder.ratingBar.setVisibility(View.INVISIBLE);
+                    }
+                }else{
+                    model.setRating(-1f);
+                    holder.ratingBar.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
     }
 
     @Override
@@ -118,7 +136,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     public void addItems(List<Articles> articles){
 
-        DocumentReference docRef;
+        /*DocumentReference docRef;
 
         for(Articles article : articles){
 
@@ -140,7 +158,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                     }
                 }
             });
-        }
+        }*/
         this.articles.addAll(articles);
     }
 
