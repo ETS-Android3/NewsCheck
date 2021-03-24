@@ -3,6 +3,7 @@ package net.sokato.NewsCheck;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -24,6 +24,11 @@ import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import net.sokato.NewsCheck.models.Articles;
 
@@ -34,6 +39,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     private List<Articles> articles;
     private Context context;
     private OnItemClickListener onItemClickListener;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();;
 
     public Adapter(List<Articles> articles, Context context) {
         this.articles = articles;
@@ -89,7 +96,15 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         holder.source.setText(model.getSource().getName());
         holder.time.setText(" \u2022 " + Utils.DateToTimeFormat(model.getPublishedAt()));
         holder.publicationDate.setText(Utils.DateFormat(model.getPublishedAt()));
-        holder.ratingBar.setRating(model.getRating());
+
+        Log.e("URL :", model.getUrl());
+
+        if(model.getRating() == -1f){
+            holder.ratingBar.setVisibility(View.INVISIBLE);
+        }else {
+            holder.ratingBar.setVisibility(View.VISIBLE);
+            holder.ratingBar.setRating(model.getRating());
+        }
     }
 
     @Override
@@ -102,10 +117,29 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     }
 
     public void addItems(List<Articles> articles){
+
+        DocumentReference docRef;
+
         for(Articles article : articles){
 
-            article.setRating(2.5f);  //TODO : fetch the rating from the server
-
+            docRef = db.collection("Articles").document(article.getUrl().replace("/", ""));
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document;
+                    if(task.isSuccessful()){
+                        document = task.getResult();
+                        if(document != null && document.exists()) {
+                            article.setRating((float)(double)document.get("rating")); //Because double != Double
+                            Log.e("aaaa: ", Float.toString(article.getRating()));
+                        }else{
+                            article.setRating(-1f);
+                        }
+                    }else{
+                        article.setRating(-1f);
+                    }
+                }
+            });
         }
         this.articles.addAll(articles);
     }

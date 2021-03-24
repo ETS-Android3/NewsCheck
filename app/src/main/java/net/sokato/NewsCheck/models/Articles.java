@@ -37,7 +37,7 @@ public class Articles {
 
     @SerializedName("rating")
     @Expose
-    private float rating;
+    private float rating = -1f;
 
     public float getRating() {
         return rating;
