@@ -1,11 +1,16 @@
 package net.sokato.NewsCheck;
 
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
+import android.view.Gravity;
 import android.widget.Toast;
 
 import net.sokato.NewsCheck.api.ApiClient;
@@ -30,11 +35,21 @@ public class MainActivity extends AppCompatActivity {
     private Adapter adapter;
     private String TAG = MainActivity.class.getSimpleName();
 
+    private DrawerLayout drawer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolBar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolBar);
         API_KEY = getResources().getString(R.string.API_KEY);
+
+        drawer = findViewById(R.id.drawer_layout);
+
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolBar, R.string.nav_drawer_open, R.string.nav_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
         recyclerView = findViewById(R.id.RecyclerView);
         layoutManager = new LinearLayoutManager(MainActivity.this);
@@ -57,6 +72,15 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter); //The first time, we set the adapter
         adapter.notifyDataSetChanged();   //Later on, only the data set will be updated
 
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(drawer.isDrawerOpen(GravityCompat.START)){
+            drawer.closeDrawer(GravityCompat.START);
+        }else {
+            super.onBackPressed();
+        }
     }
 
     public void loadJson(){
