@@ -29,14 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            android:id="@+id/RecyclerView"
-            tools:ignore="MissingConstraints">
-        </androidx.recyclerview.widget.RecyclerView>
-
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
