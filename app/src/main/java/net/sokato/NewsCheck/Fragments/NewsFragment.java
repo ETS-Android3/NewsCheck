@@ -48,7 +48,7 @@ public class NewsFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {  //TODO : move the loading of the news from the mainActivity to here
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         recyclerView = getView().findViewById(R.id.RecyclerView);
         layoutManager = new LinearLayoutManager(getActivity());
