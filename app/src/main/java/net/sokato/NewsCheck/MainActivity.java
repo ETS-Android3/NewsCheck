@@ -36,14 +36,6 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    public String API_KEY;
-    private int page = 1;
-    private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
-    private List<Articles> articles = new ArrayList<>();
-    private Adapter adapter;
-    private String TAG = MainActivity.class.getSimpleName();
-
     private DrawerLayout drawer;
 
     private NewsFragment newsFragment;
@@ -54,7 +46,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         Toolbar toolBar = findViewById(R.id.toolbar);
         setSupportActionBar(toolBar);
-        API_KEY = getResources().getString(R.string.API_KEY);
 
         drawer = findViewById(R.id.drawer_layout);
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -73,12 +64,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        loadNews();
-    }
-
-    @Override
     public void onBackPressed(){
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
@@ -93,58 +78,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.nav_news:
                 newsFragment = new NewsFragment();
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, newsFragment).commit();
-                loadNews();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    public void loadNews(){
-        recyclerView = newsFragment.getRecyclerView();
-        layoutManager = new LinearLayoutManager(MainActivity.this);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setNestedScrollingEnabled(false);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-                if (!recyclerView.canScrollVertically(1) && newState==RecyclerView.SCROLL_STATE_IDLE) {
-                    loadJson();
-                }
-            }
-        });
-
-        adapter = new Adapter(articles, MainActivity.this);
-        loadJson();
-        recyclerView.setAdapter(adapter); //The first time, we set the adapter
-        adapter.notifyDataSetChanged();   //Later on, only the data set will be updated
-    }
-
-    public void loadJson(){
-        ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
-        Call<News> call;
-        call = apiInterface.getNews(Utils.getCountry(), API_KEY, page);
-
-        call.enqueue(new Callback<News>() {
-            @Override
-            public void onResponse(Call<News> call, Response<News> response) {
-                if(response.isSuccessful() && response.body().getArticles() != null){
-                    adapter.addItems(response.body().getArticles());
-                    adapter.notifyDataSetChanged();
-                    page++;
-                }else{
-                    Toast.makeText(MainActivity.this, R.string.noResult, Toast.LENGTH_LONG).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<News> call, Throwable t) {
-
-            }
-        });
     }
 
 }
