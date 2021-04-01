@@ -2,8 +2,9 @@
     <string name="app_name">NewsCheck</string>
     <string name="topHeadlines">Top Headlines</string>
     <string name="noResult">No result !</string>
-    <string name="messages">Messages</string>
+    <string name="news">News</string>
     <string name="placeHolder">PlaceHolder</string>
     <string name="nav_drawer_open">Open the navigation drawer</string>
     <string name="nav_drawer_close">Close the navigation drawer</string>
+    <string name="userIconDesc">User icon</string>
 </resources>
