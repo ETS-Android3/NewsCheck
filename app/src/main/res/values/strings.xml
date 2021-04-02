@@ -7,4 +7,7 @@
     <string name="nav_drawer_open">Open the navigation drawer</string>
     <string name="nav_drawer_close">Close the navigation drawer</string>
     <string name="userIconDesc">User icon</string>
+    <string name="unknownUser">Unknown user</string>
+    <string name="login"><u>Login or create account</u></string>
+    <string name="loginFailure">login failed !</string>
 </resources>
