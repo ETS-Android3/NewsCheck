@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.NewsCheck">
-        <activity android:name=".WebView"></activity>
+        <activity android:name=".Account"></activity>
+        <activity android:name=".WebView" />
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

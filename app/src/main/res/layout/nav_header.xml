@@ -10,6 +10,8 @@
 
     <ImageView
         android:id="@+id/accountPicture"
+        android:clickable="true"
+        android:focusable="true"
         android:contentDescription="@string/userIconDesc"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

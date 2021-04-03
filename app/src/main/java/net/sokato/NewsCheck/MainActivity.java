@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView login;
     private TextView accountType;
     private FirebaseUser user;
+    private ImageView accountPicture;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +51,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolBar, R.string.nav_drawer_open, R.string.nav_drawer_close){
             @Override
             public void onDrawerSlide(View drawerView, float sideOffset) {  //Set the user icons and stuff here, maybe change the slide to save computing power
-                user = FirebaseAuth.getInstance().getCurrentUser();
                 login = findViewById(R.id.name);
+                accountPicture = findViewById(R.id.accountPicture);
+
                 if(user == null) {
                     login.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -74,6 +79,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }else{
                     login.setText(R.string.placeHolder);
                 }
+
+                accountPicture.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(MainActivity.this, Account.class);
+                        startActivity(intent);
+                    }
+                });
                 super.onDrawerOpened(drawerView);
             }
         };

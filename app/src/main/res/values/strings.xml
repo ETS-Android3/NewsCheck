@@ -10,4 +10,5 @@
     <string name="unknownUser">Unknown user</string>
     <string name="login"><u>Login or create account</u></string>
     <string name="loginFailure">login failed !</string>
+    <string name="logout">Logout</string>
 </resources>
