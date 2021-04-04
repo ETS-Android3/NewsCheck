@@ -9,7 +9,9 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import android.content.Intent;
+import android.media.Image;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,6 +19,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.navigation.NavigationView;
@@ -55,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolBar, R.string.nav_drawer_open, R.string.nav_drawer_close){
             @Override
-            public void onDrawerSlide(View drawerView, float sideOffset) {  //Set the user icons and stuff here, maybe change the slide to save computing power
+            public void onDrawerStateChanged(int newState) {
                 login = findViewById(R.id.name);
                 accountPicture = findViewById(R.id.accountPicture);
 
@@ -77,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
                 }else{
-                    login.setText(R.string.placeHolder);
+                    login.setText(user.getDisplayName());
+                    loadAccountPicture();
                 }
 
                 accountPicture.setOnClickListener(new View.OnClickListener() {
@@ -87,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         startActivity(intent);
                     }
                 });
-                super.onDrawerOpened(drawerView);
+                super.onDrawerStateChanged(newState);
             }
         };
 
@@ -132,11 +138,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 user = FirebaseAuth.getInstance().getCurrentUser();
+                login.setText(user.getDisplayName());
+                loadAccountPicture();
                 // ...
             } else {
                 Toast.makeText(MainActivity.this, R.string.loginFailure, Toast.LENGTH_LONG).show();
             }
         }
 
+    }
+
+    void loadAccountPicture(){
+        if(user.getPhotoUrl() != null) {
+            Glide.with(getBaseContext())
+                    .load(user.getPhotoUrl())
+                    .apply(RequestOptions.circleCropTransform())
+                    .into((ImageView) findViewById(R.id.accountPicture));
+
+            Log.e("IMAGE : ", String.valueOf(user.getPhotoUrl()));
+        }
     }
 }
