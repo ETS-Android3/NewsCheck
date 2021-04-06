@@ -17,8 +17,8 @@
             android:contentDescription="@string/userIconDesc"
             android:layout_centerHorizontal="true"
             android:src="@mipmap/ic_launcher"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_width="150dp"
+            android:layout_height="150dp"/>
 
         <Button
             android:layout_margin="20dp"

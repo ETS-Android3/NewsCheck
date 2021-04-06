@@ -24,15 +24,22 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import net.sokato.NewsCheck.Fragments.NewsFragment;
 
 import org.w3c.dom.Text;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -44,6 +51,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView accountType;
     private FirebaseUser user;
     private ImageView accountPicture;
+
+    DocumentReference docRef;
+    DocumentSnapshot document;
+
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +75,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void onDrawerStateChanged(int newState) {
                 login = findViewById(R.id.name);
                 accountPicture = findViewById(R.id.accountPicture);
+                accountType = findViewById(R.id.accountType);
 
                 if(user == null) {
                     login.setOnClickListener(new View.OnClickListener() {
@@ -82,8 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     });
                 }else{
-                    login.setText(user.getDisplayName());
-                    loadAccountPicture();
+                    loadAccountData();
                 }
 
                 accountPicture.setOnClickListener(new View.OnClickListener() {
@@ -138,9 +150,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             if (resultCode == RESULT_OK) {
                 // Successfully signed in
                 user = FirebaseAuth.getInstance().getCurrentUser();
-                login.setText(user.getDisplayName());
-                loadAccountPicture();
-                // ...
+                loadAccountData();
             } else {
                 Toast.makeText(MainActivity.this, R.string.loginFailure, Toast.LENGTH_LONG).show();
             }
@@ -148,14 +158,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
-    void loadAccountPicture(){
+    void loadAccountData(){
+
+        HashMap<String, Object> defaultData = new HashMap<>();
+        defaultData.put("username", "");
+        defaultData.put("accountType", "normal user");
+
+        login.setText(user.getDisplayName());
+
         if(user.getPhotoUrl() != null) {
             Glide.with(getBaseContext())
                     .load(user.getPhotoUrl())
                     .apply(RequestOptions.circleCropTransform())
                     .into((ImageView) findViewById(R.id.accountPicture));
-
-            Log.e("IMAGE : ", String.valueOf(user.getPhotoUrl()));
         }
+
+        docRef = db.collection("Users").document(user.getUid());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    document = task.getResult();
+                    if(document != null && document.exists()) {
+                        accountType.setText(document.get("accountType").toString());
+                    }else{
+                        docRef.set(defaultData, SetOptions.merge()); //If this is the first connection, we set up the account
+                    }
+                }else{
+                    Toast.makeText(MainActivity.this, R.string.accountDataLoadFailed, Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
     }
 }

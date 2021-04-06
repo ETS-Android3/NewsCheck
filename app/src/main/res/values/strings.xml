@@ -11,4 +11,5 @@
     <string name="login"><u>Login or create account</u></string>
     <string name="loginFailure">login failed !</string>
     <string name="logout">Logout</string>
+    <string name="accountDataLoadFailed">Failed to load the account data</string>
 </resources>

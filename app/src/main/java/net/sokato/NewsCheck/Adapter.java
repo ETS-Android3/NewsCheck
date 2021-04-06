@@ -43,7 +43,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     DocumentReference docRef;
     DocumentSnapshot document;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public Adapter(List<Articles> articles, Context context) {
         this.articles = articles;
