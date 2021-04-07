@@ -12,4 +12,5 @@
     <string name="loginFailure">login failed !</string>
     <string name="logout">Logout</string>
     <string name="accountDataLoadFailed">Failed to load the account data</string>
+    <string name="authorDefault">Unknown author</string>
 </resources>
