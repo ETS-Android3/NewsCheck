@@ -25,4 +25,8 @@ public class Comment {
     @Expose
     private String date;
 
+    @SerializedName("order")
+    @Expose
+    private int order;
+
 }
