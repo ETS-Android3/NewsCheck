@@ -1,8 +1,10 @@
 package net.sokato.NewsCheck;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import net.sokato.NewsCheck.Fragments.ArticleFragment;
 import net.sokato.NewsCheck.models.Articles;
 
 import java.util.List;
@@ -57,10 +60,18 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
         onItemClickListener = new OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+
                 Articles article = articles.get(position);
-                Intent intent = new Intent(context, WebView.class);
-                intent.putExtra("URL", article.getUrl());
-                context.startActivity(intent);
+                ArticleFragment articleFragment = new ArticleFragment();
+
+                Bundle bundle = new Bundle();
+                bundle.putString("URL", article.getUrl());
+
+                articleFragment.setArguments(bundle);
+
+                MainActivity parent = (MainActivity)context;
+                parent.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
+
             }
         };
         return new MyViewHolder(view, onItemClickListener);
