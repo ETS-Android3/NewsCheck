@@ -70,7 +70,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                 articleFragment.setArguments(bundle);
 
                 MainActivity parent = (MainActivity)context;
-                parent.getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
+                parent.getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
 
             }
         };

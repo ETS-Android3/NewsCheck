@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         switch(item.getItemId()){
             case R.id.nav_news:
                 newsFragment = new NewsFragment();
-                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, newsFragment).commit();
+                getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, newsFragment).commit();
                 break;
         }
         drawer.closeDrawer(GravityCompat.START);
