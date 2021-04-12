@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import net.sokato.NewsCheck.R;
 
 public class ArticleFragment extends Fragment {
 
     private String URL;
     private android.webkit.WebView webView;
+    private RecyclerView commentsView;
 
     @Nullable
     @Override
@@ -33,5 +36,7 @@ public class ArticleFragment extends Fragment {
         webView = getView().findViewById(R.id.webView);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(URL);
+
+        commentsView = getView().findViewById(R.id.commentsView);
     }
 }

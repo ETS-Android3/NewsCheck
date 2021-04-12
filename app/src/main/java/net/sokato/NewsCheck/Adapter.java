@@ -31,22 +31,20 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import net.sokato.NewsCheck.Fragments.ArticleFragment;
 import net.sokato.NewsCheck.models.Articles;
-
 import java.util.List;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
-    private List<Articles> articles;
-    private Context context;
+    private final List<Articles> articles;
+    private final Context context;
     private OnItemClickListener onItemClickListener;
 
     DocumentReference docRef;
     DocumentSnapshot document;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public Adapter(List<Articles> articles, Context context) {
         this.articles = articles;
@@ -148,9 +146,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     public void addItems(List<Articles> articles){
 
         /*DocumentReference docRef;
-
         for(Articles article : articles){
-
             docRef = db.collection("Articles").document(article.getUrl().replace("/", ""));
             docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
