@@ -1,4 +1,4 @@
-package net.sokato.NewsCheck.Fragments;
+    package net.sokato.NewsCheck.Fragments;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;

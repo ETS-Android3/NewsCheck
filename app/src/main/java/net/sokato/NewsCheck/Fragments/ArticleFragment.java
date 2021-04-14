@@ -1,22 +1,51 @@
 package net.sokato.NewsCheck.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import net.sokato.NewsCheck.Adapter;
+import net.sokato.NewsCheck.CommentAdapter;
+import net.sokato.NewsCheck.MainActivity;
 import net.sokato.NewsCheck.R;
+import net.sokato.NewsCheck.models.Articles;
+import net.sokato.NewsCheck.models.Comment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ArticleFragment extends Fragment {
 
     private String URL;
     private android.webkit.WebView webView;
     private RecyclerView commentsView;
+    private RecyclerView.LayoutManager layoutManager;
+    private List<Comment> comments = new ArrayList<>();
+    private CommentAdapter adapter;
+    private String TAG = MainActivity.class.getSimpleName();
+
+    DocumentReference docRef;
+    DocumentSnapshot document;
+
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Nullable
     @Override
@@ -37,6 +66,39 @@ public class ArticleFragment extends Fragment {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl(URL);
 
+        //Populate the comment list
+        db.collection("Articles").document(URL.replace("/", "")).collection("Comments")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if(task.isSuccessful()){
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+
+                                Comment comment = new Comment();
+                                comment.setAuthor(document.get("AuthorName").toString());
+                                comment.setCommentText(document.get("CommentBody").toString());
+
+                                adapter.addItem(comment);;
+                                Log.e("Comment loaded", comment.getAuthor());
+
+                            }
+                        }else{
+                            Toast.makeText(getActivity(), R.string.commentsLoadingFailed, Toast.LENGTH_LONG).show();
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+
+
         commentsView = getView().findViewById(R.id.commentsView);
+        layoutManager = new LinearLayoutManager(getActivity());
+        commentsView.setLayoutManager(layoutManager);
+        commentsView.setItemAnimator(new DefaultItemAnimator());
+        commentsView.setNestedScrollingEnabled(false);
+
+        adapter = new CommentAdapter(comments, getActivity());
+        commentsView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
     }
 }
