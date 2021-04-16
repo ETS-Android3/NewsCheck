@@ -14,4 +14,5 @@
     <string name="accountDataLoadFailed">Failed to load the account data</string>
     <string name="authorDefault">Unknown author</string>
     <string name="commentsLoadingFailed">Failed to load the comments</string>
+    <string name="newComment">New comment</string>
 </resources>

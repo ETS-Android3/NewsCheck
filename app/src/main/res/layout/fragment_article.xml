@@ -1,40 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <RelativeLayout
-        android:id="@+id/webViewLayout"
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <WebView
-            android:id="@+id/webView"
+        <RelativeLayout
+            android:id="@+id/webViewLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent">
 
-        <View
-            android:layout_above="@id/userRating"
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@android:color/darker_gray"/>
+            <WebView
+                android:id="@+id/webView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-        <RatingBar
-            android:id="@+id/userRating"
-            android:layout_below="@id/webView"
-            android:numStars="5"
-            android:layout_centerHorizontal="true"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            <View
+                android:layout_above="@id/userRating"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@android:color/darker_gray"/>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/commentsView"
-            android:layout_below="@id/userRating"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            <RatingBar
+                android:id="@+id/userRating"
+                android:layout_below="@id/webView"
+                android:numStars="5"
+                android:layout_centerHorizontal="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
 
-    </RelativeLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/commentsView"
+                android:layout_below="@id/userRating"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
 
-</androidx.core.widget.NestedScrollView>
+        </RelativeLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/newComment"
+        android:contentDescription="@string/newComment"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:src="@drawable/add"
+        app:tint="@color/white"
+        android:visibility="invisible"
+        android:layout_width="56dp"
+        android:layout_height="56dp"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
