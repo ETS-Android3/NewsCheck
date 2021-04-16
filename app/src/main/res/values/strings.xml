@@ -15,4 +15,6 @@
     <string name="authorDefault">Unknown author</string>
     <string name="commentsLoadingFailed">Failed to load the comments</string>
     <string name="newComment">New comment</string>
+    <string name="typeComment">You can type your comment here</string>
+    <string name="sendComment">Send your comment</string>
 </resources>

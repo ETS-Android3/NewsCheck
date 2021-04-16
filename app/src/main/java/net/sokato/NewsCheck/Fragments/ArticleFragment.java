@@ -50,9 +50,6 @@ public class ArticleFragment extends Fragment {
     private NestedScrollView nestedScrollView;
     private FloatingActionButton newComment;
 
-    DocumentReference docRef;
-    DocumentSnapshot document;
-
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Nullable
