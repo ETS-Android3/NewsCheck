@@ -17,4 +17,6 @@
     <string name="newComment">New comment</string>
     <string name="typeComment">You can type your comment here</string>
     <string name="sendComment">Send your comment</string>
+    <string name="ErrorSendingComment">We were unable to send your comment</string>
+    <string name="CommentSent">Your comment was successfully sent</string>
 </resources>

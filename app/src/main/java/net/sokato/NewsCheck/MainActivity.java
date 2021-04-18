@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private TextView accountType;
     private FirebaseUser user;
     private ImageView accountPicture;
+
+    /*The comment to put the new comment under
+    This can be the article itself*/
+    private CollectionReference currentComment;
 
     DocumentReference docRef;
     DocumentSnapshot document;
@@ -190,5 +195,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+    }
+
+    public CollectionReference getCurrentComment() {
+        return currentComment;
+    }
+
+    public void setCurrentComment(CollectionReference currentComment) {
+        this.currentComment = currentComment;
+    }
+
+    public FirebaseFirestore getDb() {
+        return db;
     }
 }

@@ -61,6 +61,8 @@ public class ArticleFragment extends Fragment {
             URL = getArguments().getString("URL");
         }
 
+        //TODO : check if the article exists, if not, initialise it
+
         return view;
     }
 
@@ -88,6 +90,20 @@ public class ArticleFragment extends Fragment {
                 } else if (newComment.isShown()) {
                     newComment.hide();
                 }
+            }
+        });
+
+        newComment.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                CommentFragment commentFragment;
+                //Put the comment at the root of the article
+                ((MainActivity)getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
+
+                //Launch the comment fragment
+                commentFragment = new CommentFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).commit();
             }
         });
 
