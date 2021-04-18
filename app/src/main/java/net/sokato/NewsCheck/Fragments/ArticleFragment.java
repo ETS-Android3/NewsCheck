@@ -36,7 +36,9 @@ import net.sokato.NewsCheck.models.Articles;
 import net.sokato.NewsCheck.models.Comment;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ArticleFragment extends Fragment {
 
@@ -61,7 +63,22 @@ public class ArticleFragment extends Fragment {
             URL = getArguments().getString("URL");
         }
 
-        //TODO : check if the article exists, if not, initialise it
+        //checking if the article exists, if not, initialising it
+        DocumentReference docRef = db.collection("Articles").document(URL.replace("/", ""));
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if(task.isSuccessful()){
+                    DocumentSnapshot document = task.getResult();
+                    if(document != null && !document.exists()) {
+                        //The article doesn't exist, we need to initialise it;
+                        Map<String, Object> articleData = new HashMap<>();
+                        articleData.put("rating", -1);
+                        docRef.update(articleData);
+                    }
+                }
+            }
+        });
 
         return view;
     }
@@ -103,7 +120,7 @@ public class ArticleFragment extends Fragment {
 
                 //Launch the comment fragment
                 commentFragment = new CommentFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).commit();
+                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
             }
         });
 

@@ -64,9 +64,8 @@ public class CommentFragment extends Fragment {
         sendComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO : check if the comment is empty, if not, send it
                 //TODO : get back to the article after posting
-                if(collection != null){
+                if(collection != null && !commentText.getText().toString().equals("")){
                     //Create the data to be sent to the database
                     Map<String, Object> commentData = new HashMap<>();
                     commentData.put("AuthorName", user.getDisplayName()); //TODO : update the display name on the account parameters page
@@ -83,6 +82,7 @@ public class CommentFragment extends Fragment {
                                 @Override
                                 public void onSuccess(DocumentReference documentReference) {
                                     Toast.makeText(getActivity(), R.string.CommentSent, Toast.LENGTH_LONG).show();
+                                    getFragmentManager().popBackStack();
                                 }
                             });
 
