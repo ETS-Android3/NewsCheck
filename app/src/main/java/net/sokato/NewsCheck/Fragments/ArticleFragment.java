@@ -3,12 +3,15 @@ package net.sokato.NewsCheck.Fragments;
 import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -51,6 +54,7 @@ public class ArticleFragment extends Fragment {
     private String TAG = MainActivity.class.getSimpleName();
     private NestedScrollView nestedScrollView;
     private FloatingActionButton newComment;
+    private RatingBar userRating;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -74,7 +78,7 @@ public class ArticleFragment extends Fragment {
                         //The article doesn't exist, we need to initialise it;
                         Map<String, Object> articleData = new HashMap<>();
                         articleData.put("rating", -1);
-                        docRef.update(articleData);
+                        docRef.set(articleData);
                     }
                 }
             }
@@ -145,6 +149,21 @@ public class ArticleFragment extends Fragment {
                         adapter.notifyDataSetChanged();
                     }
                 });
+
+        userRating = getView().findViewById(R.id.userRating);
+        userRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            @Override
+            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
+                final Handler handler = new Handler(Looper.getMainLooper());
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        //If the user hasn't modified the rating in the last 2.5s, we send it
+                        Toast.makeText(getActivity(), R.string.ratingSent, Toast.LENGTH_LONG).show();
+                    }
+                }, 2500);
+            }
+        });
 
 
         commentsView = getView().findViewById(R.id.commentsView);
