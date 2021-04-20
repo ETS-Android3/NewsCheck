@@ -64,6 +64,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
                 Bundle bundle = new Bundle();
                 bundle.putString("URL", article.getUrl());
+                bundle.putFloat("rating", article.getRating());
+                bundle.putFloat("totalRatings", article.getTotalRating());
+                bundle.putInt("numRatings", article.getNumRating());
 
                 articleFragment.setArguments(bundle);
 
@@ -119,6 +122,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                     document = task.getResult();
                     if(document != null && document.exists()) {
                         model.setRating(Float.parseFloat(document.get("rating").toString())); //Because double != Double
+                        model.setNumRating(Integer.parseInt(document.get("numRatings").toString()));
+                        model.setTotalRating(Float.parseFloat(document.get("totalRatings").toString()));
                         Log.e("aaaa: ", Float.toString(model.getRating()));
                         if(model.getRating() != -1f) {
                             holder.ratingBar.setVisibility(View.VISIBLE);   //Done here because otherwise it could start
@@ -146,28 +151,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     }
 
     public void addItems(List<Articles> articles){
-
-        /*DocumentReference docRef;
-        for(Articles article : articles){
-            docRef = db.collection("Articles").document(article.getUrl().replace("/", ""));
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    DocumentSnapshot document;
-                    if(task.isSuccessful()){
-                        document = task.getResult();
-                        if(document != null && document.exists()) {
-                            article.setRating((float)(double)document.get("rating")); //Because double != Double
-                            Log.e("aaaa: ", Float.toString(article.getRating()));
-                        }else{
-                            article.setRating(-1f);
-                        }
-                    }else{
-                        article.setRating(-1f);
-                    }
-                }
-            });
-        }*/
         this.articles.addAll(articles);
     }
 

@@ -39,6 +39,14 @@ public class Articles {
     @Expose
     private float rating = -1f;
 
+    @SerializedName("numRating")
+    @Expose
+    private int numRating;
+
+    @SerializedName("totalRating")
+    @Expose
+    private float totalRating;
+
     public float getRating() {
         return rating;
     }
@@ -101,5 +109,21 @@ public class Articles {
 
     public void setPublishedAt(String publishedAt) {
         this.publishedAt = publishedAt;
+    }
+
+    public int getNumRating() {
+        return numRating;
+    }
+
+    public void setNumRating(int numRating) {
+        this.numRating = numRating;
+    }
+
+    public float getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(float totalRating) {
+        this.totalRating = totalRating;
     }
 }

@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,6 +47,9 @@ import java.util.Map;
 public class ArticleFragment extends Fragment {
 
     private String URL;
+    private float rating;
+    private float totalRating;
+    private int numRatings;
     private android.webkit.WebView webView;
     private RecyclerView commentsView;
     private RecyclerView.LayoutManager layoutManager;
@@ -65,6 +69,9 @@ public class ArticleFragment extends Fragment {
 
         if (getArguments() != null) {
             URL = getArguments().getString("URL");
+            rating = getArguments().getFloat("rating");
+            totalRating = getArguments().getFloat("totalRating");
+            numRatings = getArguments().getInt("numRatings");
         }
 
         //checking if the article exists, if not, initialising it
@@ -78,6 +85,8 @@ public class ArticleFragment extends Fragment {
                         //The article doesn't exist, we need to initialise it;
                         Map<String, Object> articleData = new HashMap<>();
                         articleData.put("rating", -1);
+                        articleData.put("numRatings", 0);
+                        articleData.put("totalRatings", 0);
                         docRef.set(articleData);
                     }
                 }
@@ -151,20 +160,43 @@ public class ArticleFragment extends Fragment {
                 });
 
         userRating = getView().findViewById(R.id.userRating);
-        userRating.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
-            @Override
-            public void onRatingChanged(RatingBar ratingBar, float rating, boolean fromUser) {
-                final Handler handler = new Handler(Looper.getMainLooper());
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        //If the user hasn't modified the rating in the last 2.5s, we send it
-                        Toast.makeText(getActivity(), R.string.ratingSent, Toast.LENGTH_LONG).show();
-                    }
-                }, 2500);
-            }
-        });
 
+        db.collection("Articles").document(URL.replace("/", "")).collection("Ratings")
+                .document(((MainActivity)getActivity()).getUser().getUid())
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if(documentSnapshot.exists()){
+                            //The user has already posted a rating
+                            //We display the overall rating
+                            userRating.setRating(rating);
+                            userRating.setIsIndicator(true); //To prevent the user from changing the value
+                        }else{
+                            userRating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                                final Handler handler = new Handler(Looper.getMainLooper());
+                                handler.postDelayed(() -> {
+                                    //If the user hasn't modified the rating in the last 2.5s, we try to send it
+
+                                    Map<String, Object> ratingData = new HashMap<>();
+                                    ratingData.put("rating", userRating.getRating());
+
+                                    db.collection("Articles").document(URL.replace("/", "")).collection("Ratings")
+                                            .document(((MainActivity)getActivity()).getUser().getUid())
+                                            .set(ratingData).addOnCompleteListener(task -> {
+                                                if(task.isSuccessful()){
+                                                    Toast.makeText(getActivity(), R.string.ratingSent, Toast.LENGTH_LONG).show();
+                                                    //We display the overall rating
+                                                    updateRating(userRating.getRating());
+                                                }else{
+                                                    Toast.makeText(getActivity(), R.string.ratingError, Toast.LENGTH_LONG).show();
+                                                }
+                                            });
+                                }, 2500);
+                            });
+                        }
+                    }
+                });
 
         commentsView = getView().findViewById(R.id.commentsView);
         layoutManager = new LinearLayoutManager(getActivity());
@@ -175,5 +207,22 @@ public class ArticleFragment extends Fragment {
         adapter = new CommentAdapter(comments, getActivity());
         commentsView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+    }
+
+    void updateRating(float newRating){
+
+        totalRating += newRating;
+        numRatings++;
+
+        Map<String, Object> ratingData = new HashMap<>();
+        ratingData.put("rating", totalRating/numRatings);
+        ratingData.put("numRatings", numRatings);
+        ratingData.put("totalRatings", totalRating);
+
+        userRating.setRating(totalRating/numRatings);
+        userRating.setIsIndicator(true); //To prevent the user from changing the value
+
+        db.collection("Articles").document(URL.replace("/", ""))
+                .set(ratingData);
     }
 }

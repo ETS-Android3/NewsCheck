@@ -208,4 +208,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public FirebaseFirestore getDb() {
         return db;
     }
+
+    public FirebaseUser getUser() {
+        return user;
+    }
 }
