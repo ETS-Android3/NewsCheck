@@ -124,7 +124,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
                         model.setRating(Float.parseFloat(document.get("rating").toString())); //Because double != Double
                         model.setNumRating(Integer.parseInt(document.get("numRatings").toString()));
                         model.setTotalRating(Float.parseFloat(document.get("totalRatings").toString()));
-                        Log.e("aaaa: ", Float.toString(model.getRating()));
+                        //Log.e("aaaa: ", Float.toString(model.getRating()));
                         if(model.getRating() != -1f) {
                             holder.ratingBar.setVisibility(View.VISIBLE);   //Done here because otherwise it could start
                             holder.ratingBar.setRating(model.getRating());  //to display before the value was loaded
