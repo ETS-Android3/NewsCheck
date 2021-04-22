@@ -208,11 +208,18 @@ public class ArticleFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
+                            adapter.flushComments();
                             for (QueryDocumentSnapshot document : task.getResult()) {
                                 Comment comment = new Comment();
                                 comment.setAuthor(document.get("AuthorName").toString());
                                 comment.setCommentText(document.get("CommentBody").toString());
                                 comment.setAuthorID(document.get("AuthorID").toString());
+                                comment.setOrder(0);
+                                comment.setParent(db.collection("Articles")
+                                        .document(URL.replace("/", ""))
+                                        .collection("Comments")
+                                        .document(document.getId())
+                                        .collection("Comments"));
                                 getStatus(comment);
                             }
                         } else {

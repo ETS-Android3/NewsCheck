@@ -1,5 +1,6 @@
 package net.sokato.NewsCheck.models;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -28,6 +29,10 @@ public class Comment {
     @SerializedName("order")
     @Expose
     private int order;
+
+    @SerializedName("dbPath")
+    @Expose
+    private CollectionReference parent;
 
     public String getAuthorID() {
         return authorID;
@@ -75,5 +80,13 @@ public class Comment {
 
     public void setOrder(int order) {
         this.order = order;
+    }
+
+    public CollectionReference getParent() {
+        return parent;
+    }
+
+    public void setParent(CollectionReference parent) {
+        this.parent = parent;
     }
 }

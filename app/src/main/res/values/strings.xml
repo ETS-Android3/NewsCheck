@@ -21,4 +21,5 @@
     <string name="CommentSent">Your comment was successfully sent</string>
     <string name="ratingSent">Rating sent</string>
     <string name="ratingError">Failed to send your comment</string>
+    <string name="respond">respond</string>
 </resources>

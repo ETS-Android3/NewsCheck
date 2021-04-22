@@ -34,6 +34,7 @@
                     android:textStyle="bold"/>
 
                 <TextView
+                    android:layout_marginStart="16dp"
                     android:id="@+id/authorStatus"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -47,6 +48,17 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:ignore="HardcodedText" />
+
+                <TextView
+                    android:id="@+id/respondButton"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="@string/respond"
+                    android:layout_margin="10dp"
+                    android:layout_below="@id/commentBody"
+                    android:layout_alignParentEnd="true"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
 
             </RelativeLayout>
 

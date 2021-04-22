@@ -33,6 +33,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import net.sokato.NewsCheck.Fragments.ArticleFragment;
+import net.sokato.NewsCheck.Fragments.CommentFragment;
 import net.sokato.NewsCheck.models.Articles;
 import net.sokato.NewsCheck.models.Comment;
 
@@ -66,6 +67,9 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
 
             }
         };
+
+
+
         return new MyCommentViewHolder(view, onItemClickListener);
     }
 
@@ -77,6 +81,16 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.authorName.setText(model.getAuthor());
         holder.authorStatus.setText(model.getAuthorStatus());
         holder.commentBody.setText(model.getCommentText());
+
+        holder.respondButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity)context).setCurrentComment(model.getParent());
+                //Launch the comment fragment
+                CommentFragment commentFragment = new CommentFragment();
+                ((MainActivity)context).getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
+            }
+        });
 
     }
 
@@ -95,7 +109,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
 
     public class MyCommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
 
-        TextView authorName, authorStatus, commentBody;
+        TextView authorName, authorStatus, commentBody, respondButton;
         RecyclerView childCommentsView;
         OnItemClickListener onItemClickListener;
 
@@ -106,6 +120,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
             authorStatus = itemView.findViewById(R.id.authorStatus);
             commentBody = itemView.findViewById(R.id.commentBody);
             childCommentsView = itemView.findViewById(R.id.childCommentsView);
+            respondButton = itemView.findViewById(R.id.respondButton);
             this.onItemClickListener = onItemClickListener;
 
         }
@@ -114,6 +129,10 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         public void onClick(View v) {
             onItemClickListener.onItemClick(v, getAdapterPosition());
         }
+    }
+
+    public void flushComments(){
+        this.comments.clear();
     }
 
     public void addItem(Comment comment){
