@@ -55,7 +55,7 @@ public class CommentFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         //Finding where to put the comment in the database
-        db = ((MainActivity)getActivity()).getDb();
+        db = FirebaseFirestore.getInstance();
         collection = ((MainActivity)getActivity()).getCurrentComment();
 
         commentText = Objects.requireNonNull(getView()).findViewById(R.id.commentText);
@@ -69,6 +69,7 @@ public class CommentFragment extends Fragment {
                     Map<String, Object> commentData = new HashMap<>();
                     commentData.put("AuthorName", user.getDisplayName()); //TODO : update the display name on the account parameters page
                     commentData.put("CommentBody", commentText.getText().toString());
+                    commentData.put("AuthorID", user.getUid());
 
                     collection.add(commentData)
                             .addOnFailureListener(new OnFailureListener() {

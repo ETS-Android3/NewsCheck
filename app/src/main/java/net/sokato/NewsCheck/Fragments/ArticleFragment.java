@@ -50,6 +50,7 @@ public class ArticleFragment extends Fragment {
     private float rating;
     private float totalRating;
     private int numRatings;
+    private String status = "";
     private android.webkit.WebView webView;
     private RecyclerView commentsView;
     private RecyclerView.LayoutManager layoutManager;
@@ -139,25 +140,7 @@ public class ArticleFragment extends Fragment {
             }
         });
 
-        //Populate the comment list
-        db.collection("Articles").document(URL.replace("/", "")).collection("Comments")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Comment comment = new Comment();
-                                comment.setAuthor(document.get("AuthorName").toString());
-                                comment.setCommentText(document.get("CommentBody").toString());
-                                adapter.addItem(comment);
-                            }
-                        } else {
-                            Toast.makeText(getActivity(), R.string.commentsLoadingFailed, Toast.LENGTH_LONG).show();
-                        }
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+        LoadComments();
 
         userRating = getView().findViewById(R.id.userRating);
 
@@ -217,13 +200,54 @@ public class ArticleFragment extends Fragment {
         }
     };
 
+    void LoadComments(){
+        //Populate the comment list
+        db.collection("Articles").document(URL.replace("/", "")).collection("Comments")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Comment comment = new Comment();
+                                comment.setAuthor(document.get("AuthorName").toString());
+                                comment.setCommentText(document.get("CommentBody").toString());
+                                comment.setAuthorID(document.get("AuthorID").toString());
+                                getStatus(comment);
+                            }
+                        } else {
+                            Toast.makeText(getActivity(), R.string.commentsLoadingFailed, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+    }
+
+    void getStatus(Comment comment){
+
+        db.collection("Users").document(comment.getAuthorID())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(!task.isSuccessful()){
+                        status = "";
+                    }else if(!task.getResult().exists()){
+                        Log.e("fuck", "");
+                        status = "";
+                    }else{
+                        status = task.getResult().getString("accountType");
+                        if(status!=null && status.equals("normal user")){
+                            status = "";
+                        }
+                        comment.setAuthorStatus(status);
+                        adapter.addItem(comment);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
     void updateRating(float newRating){
 
         totalRating += newRating;
         numRatings++;
-
-        Log.e("aaaa", Float.toString(totalRating));
-        Log.e("bbbb", Integer.toString(numRatings));
 
         Map<String, Object> ratingData = new HashMap<>();
         ratingData.put("rating", totalRating/numRatings);
