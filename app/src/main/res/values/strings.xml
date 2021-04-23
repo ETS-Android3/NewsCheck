@@ -22,4 +22,5 @@
     <string name="ratingSent">Rating sent</string>
     <string name="ratingError">Failed to send your comment</string>
     <string name="respond">respond</string>
+    <string name="needToLogin">You need to login first</string>
 </resources>

@@ -13,9 +13,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -31,12 +34,15 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import net.sokato.NewsCheck.Fragments.ArticleFragment;
 import net.sokato.NewsCheck.Fragments.CommentFragment;
 import net.sokato.NewsCheck.models.Articles;
 import net.sokato.NewsCheck.models.Comment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommentViewHolder>{
@@ -44,6 +50,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
     private List<Comment> comments;
     private Context context;
     private OnItemClickListener onItemClickListener;
+
+    private String status;
 
     DocumentReference docRef;
     DocumentSnapshot document;
@@ -81,6 +89,21 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.authorName.setText(model.getAuthor());
         holder.authorStatus.setText(model.getAuthorStatus());
         holder.commentBody.setText(model.getCommentText());
+
+        //Loading the child comments
+
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
+        holder.childCommentsView.setLayoutManager(layoutManager);
+        holder.childCommentsView.setItemAnimator(new DefaultItemAnimator());
+        holder.childCommentsView.setNestedScrollingEnabled(false);
+
+        List<Comment> childComments = new ArrayList<>();
+        CommentAdapter adapter = new CommentAdapter(childComments, context);
+
+        LoadComments(model, adapter);
+
+        holder.childCommentsView.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
         holder.respondButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -129,6 +152,51 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         public void onClick(View v) {
             onItemClickListener.onItemClick(v, getAdapterPosition());
         }
+    }
+
+    void LoadComments(Comment currentComment, CommentAdapter adapter){
+        //Populate the comment list
+        currentComment.getParent()
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            adapter.flushComments();
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Comment comment = new Comment();
+                                comment.setAuthor(document.get("AuthorName").toString());
+                                comment.setCommentText(document.get("CommentBody").toString());
+                                comment.setAuthorID(document.get("AuthorID").toString());
+                                comment.setOrder(currentComment.getOrder()+1);
+                                comment.setParent(currentComment.getParent().document(document.getId()).collection("Comments"));
+                                getStatus(comment, adapter);
+                            }
+                        }
+                    }
+                });
+    }
+
+    void getStatus(Comment comment, CommentAdapter adapter){
+
+        db.collection("Users").document(comment.getAuthorID())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if(!task.isSuccessful()){
+                        status = "";
+                    }else if(!task.getResult().exists()){
+                        Log.e("fuck", "");
+                        status = "";
+                    }else{
+                        status = task.getResult().getString("accountType");
+                        if(status!=null && status.equals("normal user")){
+                            status = "";
+                        }
+                        comment.setAuthorStatus(status);
+                        adapter.addItem(comment);
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     public void flushComments(){

@@ -66,19 +66,20 @@
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <View
                 android:padding="5dp"
-                android:layout_margin="5dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginEnd="5dp"
                 android:layout_width="2dp"
                 android:background="@color/cardview_dark_background"
                 android:layout_height="match_parent"/>
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/childCommentsView"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 
         </LinearLayout>

@@ -26,6 +26,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -64,6 +66,7 @@ public class ArticleFragment extends Fragment {
     private final Handler handler = new Handler(Looper.getMainLooper());;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     @Nullable
     @Override
@@ -129,14 +132,17 @@ public class ArticleFragment extends Fragment {
         newComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(user == null){
+                    Toast.makeText(getActivity(), R.string.needToLogin, Toast.LENGTH_LONG).show();
+                }else{
+                    CommentFragment commentFragment;
+                    //Put the comment at the root of the article
+                    ((MainActivity) getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
 
-                CommentFragment commentFragment;
-                //Put the comment at the root of the article
-                ((MainActivity)getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
-
-                //Launch the comment fragment
-                commentFragment = new CommentFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
+                    //Launch the comment fragment
+                    commentFragment = new CommentFragment();
+                    getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
+                }
             }
         });
 
@@ -146,7 +152,7 @@ public class ArticleFragment extends Fragment {
 
         //TODO : clean this mess of listeners
 
-        if(((MainActivity)getActivity()).getUser() == null){
+        if(user == null){
             userRating.setRating(rating);
             userRating.setIsIndicator(true); //To prevent the user from changing the value
         }else {
