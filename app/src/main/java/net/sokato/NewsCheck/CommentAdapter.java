@@ -31,6 +31,8 @@ import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -53,10 +55,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
 
     private String status;
 
-    DocumentReference docRef;
-    DocumentSnapshot document;
-
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
     public CommentAdapter(List<Comment> comments, Context context) {
         this.comments = comments;
@@ -108,10 +108,14 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.respondButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity)context).setCurrentComment(model.getParent());
-                //Launch the comment fragment
-                CommentFragment commentFragment = new CommentFragment();
-                ((MainActivity)context).getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
+                if(user!=null) {
+                    ((MainActivity) context).setCurrentComment(model.getParent());
+                    //Launch the comment fragment
+                    CommentFragment commentFragment = new CommentFragment();
+                    ((MainActivity) context).getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
+                }else{
+                    Toast.makeText(context, R.string.needToLogin, Toast.LENGTH_LONG).show();
+                }
             }
         });
 
