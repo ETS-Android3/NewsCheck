@@ -64,6 +64,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
                 Bundle bundle = new Bundle();
                 bundle.putString("URL", article.getUrl());
+                bundle.putString("URLToImage", article.getUrlToImage());
                 bundle.putFloat("rating", article.getRating());
                 bundle.putFloat("totalRatings", article.getTotalRating());
                 bundle.putInt("numRatings", article.getNumRating());

@@ -1,7 +1,11 @@
 package net.sokato.NewsCheck.Fragments;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Point;
+import android.graphics.drawable.Drawable;
+import android.media.Image;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,17 +15,29 @@ import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RatingBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -38,6 +54,7 @@ import net.sokato.NewsCheck.Adapter;
 import net.sokato.NewsCheck.CommentAdapter;
 import net.sokato.NewsCheck.MainActivity;
 import net.sokato.NewsCheck.R;
+import net.sokato.NewsCheck.Utils;
 import net.sokato.NewsCheck.models.Articles;
 import net.sokato.NewsCheck.models.Comment;
 
@@ -49,24 +66,38 @@ import java.util.Map;
 public class ArticleFragment extends Fragment {
 
     private String URL;
+    private String URLToImage;
     private float rating;
     private float totalRating;
     private int numRatings;
     private String status = "";
-    private android.webkit.WebView webView;
     private RecyclerView commentsView;
     private RecyclerView.LayoutManager layoutManager;
     private List<Comment> comments = new ArrayList<>();
     private CommentAdapter adapter;
     private String TAG = MainActivity.class.getSimpleName();
-    private NestedScrollView nestedScrollView;
     private FloatingActionButton newComment;
     private RatingBar userRating;
+
+    private CardView cardView;
+    private ImageView imgP;
 
     private final Handler handler = new Handler(Looper.getMainLooper());;
 
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+    //Variable used to prevent the user from reacting too fast
+    //In less than one minute, we assume that he didn't read the
+    //article
+    private boolean canComment = false;
+    private final int interval = 60000; // 1 Minute
+    private final Handler commentHandler = new Handler();
+    private final Runnable runnable = new Runnable(){
+        public void run() {
+            canComment = true;
+        }
+    };
 
     @Nullable
     @Override
@@ -75,6 +106,7 @@ public class ArticleFragment extends Fragment {
 
         if (getArguments() != null) {
             URL = getArguments().getString("URL");
+            URLToImage = getArguments().getString("URLToImage");
             rating = getArguments().getFloat("rating");
             totalRating = getArguments().getFloat("totalRatings");
             numRatings = getArguments().getInt("numRatings");
@@ -102,39 +134,24 @@ public class ArticleFragment extends Fragment {
         return view;
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        webView = getView().findViewById(R.id.webView);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.loadUrl(URL);
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-        int height = size.y;
-
-        nestedScrollView = getView().findViewById(R.id.nestedScrollView);
         newComment = getView().findViewById(R.id.newComment);
 
-        nestedScrollView.setOnScrollChangeListener(new NestedScrollView.OnScrollChangeListener() {
-            @Override
-            public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
-                if (scrollY > webView.getHeight() - height) {
-                    newComment.show();
-                } else if (newComment.isShown()) {
-                    newComment.hide();
-                }
-            }
-        });
-
+        //The user clicks on the new comment button
         newComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(user == null){
+                    //If he is not logged in, we say it
                     Toast.makeText(getActivity(), R.string.needToLogin, Toast.LENGTH_LONG).show();
+                }else if(!canComment) {
+                    //If the user hasn't been here for long enough
+                    Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
                 }else{
+                    //Else, everything is good, we let the use comment on the article
                     CommentFragment commentFragment;
                     //Put the comment at the root of the article
                     ((MainActivity) getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
@@ -150,8 +167,6 @@ public class ArticleFragment extends Fragment {
 
         userRating = getView().findViewById(R.id.userRating);
 
-        //TODO : clean this mess of listeners
-
         if(user == null){
             userRating.setRating(rating);
             userRating.setIsIndicator(true); //To prevent the user from changing the value
@@ -162,12 +177,20 @@ public class ArticleFragment extends Fragment {
                     .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
                         public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            if(!documentSnapshot.exists()) {
+                            //We check if the user has already rated the article
+                            if(!documentSnapshot.exists()) { //If not
+                                //We use this to see if the user has modified the
+                                //rating bar. If he did and left it then, we assume
+                                //that it is his final rating
                                 userRating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-                                    //We remove previous tasks if they existed
-                                    handler.removeCallbacks(sendRating);
-                                    //And we create a new one
-                                    handler.postDelayed(sendRating, 2500);
+                                    if(canComment) {
+                                        //We remove previous tasks if they existed
+                                        handler.removeCallbacks(sendRating);
+                                        //And we create a new one
+                                        handler.postDelayed(sendRating, 2500);
+                                    }else{
+                                        Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
+                                    }
                                 });
                             }
                         }
@@ -183,6 +206,48 @@ public class ArticleFragment extends Fragment {
         adapter = new CommentAdapter(comments, getActivity());
         commentsView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
+
+        cardView = getActivity().findViewById(R.id.articleCardView);
+        imgP = getActivity().findViewById(R.id.imgP);
+
+        cardView.setOnClickListener(v -> {
+            //We launch the browser to see the article
+            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(URL));
+            startActivity(browserIntent);
+
+            //We need the activity up for one minute before the use can comment
+            //To make sure that he read the article
+            commentHandler.postDelayed(runnable, interval);
+        });
+
+        //We load the image
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.placeholder(Utils.getRandomDrawableColor());
+        requestOptions.error(Utils.getRandomDrawableColor());
+        requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
+        requestOptions.centerCrop();
+
+        Glide.with(getActivity()).load(URLToImage)
+                .apply(requestOptions)
+                .listener(new RequestListener<Drawable>() {
+
+                    final ProgressBar progressBar = getActivity().findViewById(R.id.articleLoading);
+
+                    @Override
+                    public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                        progressBar.setVisibility(View.GONE);
+                        return false;
+                    }
+                })
+                .transition(DrawableTransitionOptions.withCrossFade())
+                .into(imgP);
+
     }
 
     //Runnable used to start the rating process

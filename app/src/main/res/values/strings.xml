@@ -23,4 +23,7 @@
     <string name="ratingError">Failed to send your comment</string>
     <string name="respond">respond</string>
     <string name="needToLogin">You need to login first</string>
+    <string name="verifyAccount">Verify your account</string>
+    <string name="needToStay">You need to look at the article a bit longer before commenting</string>
+    <string name="openArticle">Open this article</string>
 </resources>
