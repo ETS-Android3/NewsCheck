@@ -35,6 +35,8 @@ import net.sokato.NewsCheck.Fragments.ArticleFragment;
 import net.sokato.NewsCheck.models.Articles;
 import java.util.List;
 
+/**These adapters are here to display the articles data into the recyclerView**/
+
 public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
 
     private final List<Articles> articles;
@@ -55,26 +57,26 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolder>{
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item, parent, false);
-        onItemClickListener = new OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
 
-                Articles article = articles.get(position);
-                ArticleFragment articleFragment = new ArticleFragment();
+        //This is used to launch the article fragment, with the clicked article
+        onItemClickListener = (view1, position) -> {
 
-                Bundle bundle = new Bundle();
-                bundle.putString("URL", article.getUrl());
-                bundle.putString("URLToImage", article.getUrlToImage());
-                bundle.putFloat("rating", article.getRating());
-                bundle.putFloat("totalRatings", article.getTotalRating());
-                bundle.putInt("numRatings", article.getNumRating());
+            Articles article = articles.get(position);
+            ArticleFragment articleFragment = new ArticleFragment();
 
-                articleFragment.setArguments(bundle);
+            //We send the relevant data to the other fragment
+            Bundle bundle = new Bundle();
+            bundle.putString("URL", article.getUrl());
+            bundle.putString("URLToImage", article.getUrlToImage());
+            bundle.putFloat("rating", article.getRating());
+            bundle.putFloat("totalRatings", article.getTotalRating());
+            bundle.putInt("numRatings", article.getNumRating());
 
-                MainActivity parent = (MainActivity)context;
-                parent.getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
+            articleFragment.setArguments(bundle);
 
-            }
+            MainActivity parent1 = (MainActivity)context;
+            parent1.getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, articleFragment).addToBackStack(null).commit();
+
         };
         return new MyViewHolder(view, onItemClickListener);
     }

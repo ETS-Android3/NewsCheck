@@ -70,7 +70,7 @@ public class ArticleFragment extends Fragment {
     private float rating;
     private float totalRating;
     private int numRatings;
-    private String status = "";
+    private String status = "";  //String holding the status of the user posting a comment
     private RecyclerView commentsView;
     private RecyclerView.LayoutManager layoutManager;
     private List<Comment> comments = new ArrayList<>();

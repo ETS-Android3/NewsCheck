@@ -32,6 +32,12 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+/**This activity is where the user can modify the application's
+ * parameters, as well as his account's parameters
+ * It is a separate activity and not a fragment to allow us to reload
+ * the main activity afterwards, making the changes effective without
+ * the need for a reboot**/
+
 public class Account extends AppCompatActivity {
 
     private Button logoutButton;

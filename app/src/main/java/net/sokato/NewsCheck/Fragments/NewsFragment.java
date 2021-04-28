@@ -29,6 +29,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+/*This is the main fragment, it displays the most recent popular news, fetched from NewsAPI*/
+
 public class NewsFragment extends Fragment {
 
     public String API_KEY;
@@ -56,6 +58,8 @@ public class NewsFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(false);
 
+        //We use this listener to see if the user has reached the end of the articles
+        //If he has, we try to load some more
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
@@ -66,12 +70,14 @@ public class NewsFragment extends Fragment {
             }
         });
 
+        //We use this adapter to display the articles
         adapter = new Adapter(articles, getActivity());
         loadJson();
         recyclerView.setAdapter(adapter); //The first time, we set the adapter
         adapter.notifyDataSetChanged();   //Later on, only the data set will be updated
     }
 
+    //This function fetches the articles from NewsAPI and sends them to the adapter
     public void loadJson(){
         ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
         Call<News> call;
@@ -91,7 +97,7 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<News> call, Throwable t) {
-
+                Toast.makeText(getActivity(), R.string.artclesLoadingFailure, Toast.LENGTH_LONG).show();
             }
         });
     }

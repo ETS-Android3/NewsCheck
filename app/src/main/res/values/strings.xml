@@ -26,4 +26,5 @@
     <string name="verifyAccount">Verify your account</string>
     <string name="needToStay">You need to look at the article a bit longer before commenting</string>
     <string name="openArticle">Open this article</string>
+    <string name="artclesLoadingFailure">Failed to load articles</string>
 </resources>

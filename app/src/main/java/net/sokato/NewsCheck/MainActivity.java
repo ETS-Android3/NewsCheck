@@ -43,6 +43,11 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+/*Because we use lots of fragments instead of activities,
+nothing is really drawn in this activity.
+We have a few global variables that are here in order to pass
+objects between fragments, as it isn't supported by default. */
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawer;
@@ -60,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     DocumentReference docRef;
     DocumentSnapshot document;
 
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,14 +83,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolBar, R.string.nav_drawer_open, R.string.nav_drawer_close){
             @Override
             public void onDrawerStateChanged(int newState) {
+                //This function is called every time the drawer is moved
+                //from a resting state to another
                 login = findViewById(R.id.name);
                 accountPicture = findViewById(R.id.accountPicture);
                 accountType = findViewById(R.id.accountType);
 
+                //This is where we decide what to draw on the drawer
                 if(user == null) {
+                    //The login is handled by Firebase, which is a secure solution
+                    //And it is easy to implement
                     login.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) { //Start the login activity
+                            //We implement the chosen login methods
                             List<AuthUI.IdpConfig> providers = Arrays.asList(
                                     new AuthUI.IdpConfig.EmailBuilder().build(),
                                     new AuthUI.IdpConfig.GoogleBuilder().build());
@@ -103,6 +114,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     loadAccountData();
                 }
 
+                //This is used to launch an activity in which the user can
+                //modify his parameters
                 accountPicture.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -120,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         toggle.syncState();
 
         if(savedInstanceState == null) {  //If this is the first loading of the activity
+            //We load the main fragment
             newsFragment = new NewsFragment();
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, newsFragment).commit();
             navigationView.setCheckedItem(R.id.nav_news);
@@ -128,7 +142,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public void onBackPressed(){
+    public void onBackPressed(){ //Function called when the user presses the back button
         if(drawer.isDrawerOpen(GravityCompat.START)){
             drawer.closeDrawer(GravityCompat.START);
         }else {
@@ -137,8 +151,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) { //Function called when the uses chooses an item from the drawer
         switch(item.getItemId()){
+            //It only has a single item for now.
             case R.id.nav_news:
                 newsFragment = new NewsFragment();
                 getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, newsFragment).commit();
@@ -165,6 +180,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    //This function is tasked with retrieving the user's data
+    //from the Firebase database
     void loadAccountData(){
 
         HashMap<String, Object> defaultData = new HashMap<>();
@@ -173,6 +190,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         login.setText(user.getDisplayName());
 
+        //If the user has a profile picture, we fetch it
         if(user.getPhotoUrl() != null) {
             Glide.with(getBaseContext())
                     .load(user.getPhotoUrl())
@@ -181,19 +199,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         docRef = db.collection("Users").document(user.getUid());
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if(task.isSuccessful()){
-                    document = task.getResult();
-                    if(document != null && document.exists()) {
-                        accountType.setText(document.get("accountType").toString());
-                    }else{
-                        docRef.set(defaultData, SetOptions.merge()); //If this is the first connection, we set up the account
-                    }
+        docRef.get().addOnCompleteListener(task -> {
+            if(task.isSuccessful()){
+                document = task.getResult();
+                if(document != null && document.exists()) {
+                    accountType.setText(document.get("accountType").toString());
                 }else{
-                    Toast.makeText(MainActivity.this, R.string.accountDataLoadFailed, Toast.LENGTH_LONG).show();
+                    docRef.set(defaultData, SetOptions.merge()); //If this is the first connection, we set up the account
                 }
+            }else{
+                Toast.makeText(MainActivity.this, R.string.accountDataLoadFailed, Toast.LENGTH_LONG).show();
             }
         });
 
@@ -205,10 +220,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void setCurrentComment(CollectionReference currentComment) {
         this.currentComment = currentComment;
-    }
-
-    public FirebaseFirestore getDb() {
-        return db;
     }
 
     public FirebaseUser getUser() {
