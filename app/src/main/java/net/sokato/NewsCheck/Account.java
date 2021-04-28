@@ -73,6 +73,8 @@ public class Account extends AppCompatActivity {
           dispatchTakePictureIntent();
         });
 
+        //Once again, if the user has an account picture set up
+        //we try to load it
         userIcon = findViewById(R.id.accountParametersIcon);
         if(user.getPhotoUrl() != null) {
             Glide.with(Account.this)
@@ -82,6 +84,9 @@ public class Account extends AppCompatActivity {
         }
     }
 
+    //This function is used to start the picture taking process
+    //It sends an intent for the default photo app, if there is one, to
+    //open up and take a picture
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
@@ -105,34 +110,39 @@ public class Account extends AppCompatActivity {
         }
     }
 
+    //This function is called when we return from the photo app, this is where we choose
+    //what to do based on the result
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        //If everything was okay
         if(resultCode == Activity.RESULT_OK){
             uploadPhoto();
+        //If the user cancelled the picture
         }else if(resultCode == Activity.RESULT_CANCELED) {
-            //Write your code if there's no result
+            //TODO: handle when the user cancels the picture
         }
     }
 
+    //This function uploads the photo to Firebase for processing
     private void uploadPhoto(){
-        StorageReference mountainImagesRef = storageReference.child(user.getUid()+".jpg");
-        mountainImagesRef.putFile(Uri.fromFile(new File(currentPhotoPath)));
+        //We store the picture as the user's UID.jpg
+        StorageReference imageRef = storageReference.child(user.getUid()+".jpg");
+        imageRef.putFile(Uri.fromFile(new File(currentPhotoPath)));
     }
 
-
+    //This function is responsible for creating the file in which the picture will be
+    //stored on the device
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.FRANCE).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
+                imageFileName,   /* prefix */
+                ".jpg",   /* suffix */
                 storageDir      /* directory */
         );
-
-        // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
         return image;
     }

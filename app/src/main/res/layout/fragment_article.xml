@@ -15,6 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+            <!--this View is the one the user should click-->
+            <!--to open the article and start the timer-->
             <androidx.cardview.widget.CardView
                 android:id="@+id/articleCardView"
                 android:clickable="true"
@@ -78,6 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
+            <!--recyclerView to hold the comments-->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/commentsView"
                 android:layout_below="@id/userRating"
