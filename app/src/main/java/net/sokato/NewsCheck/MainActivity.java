@@ -43,10 +43,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-/*Because we use lots of fragments instead of activities,
-nothing is really drawn in this activity.
-We have a few global variables that are here in order to pass
-objects between fragments, as it isn't supported by default. */
+/**Because we use lots of fragments instead of activities,
+ * nothing is really drawn in this activity.
+ * We have a few global variables that are here in order to pass
+ * objects between fragments, as it isn't supported by default.**/
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 

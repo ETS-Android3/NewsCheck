@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Random;
 
+/**This class holds a few useful methods that might be used
+ * anywhere in the application**/
+
 public class Utils {
 
     public static ColorDrawable[] vibrantLightColorList =
@@ -49,7 +52,7 @@ public class Utils {
         String newDate;
         SimpleDateFormat dateFormat = new SimpleDateFormat("E, d MMM yyyy", new Locale(getCountry()));
         try {
-            Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(oldStringDate);
+            Date date = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.FRANCE).parse(oldStringDate);
             newDate = dateFormat.format(date);
         } catch (ParseException e) {
             e.printStackTrace();

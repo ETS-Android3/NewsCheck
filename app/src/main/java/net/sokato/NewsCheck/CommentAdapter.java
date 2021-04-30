@@ -47,6 +47,11 @@ import net.sokato.NewsCheck.models.Comment;
 import java.util.ArrayList;
 import java.util.List;
 
+/**This class creates adapters for the comment system.
+ * Each comment is a cardView with the data on it, followed by
+ * a RecyclerView, that can be empty, and is filled with the
+ * responses to this comment**/
+
 public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommentViewHolder>{
 
     private List<Comment> comments;
@@ -90,7 +95,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.authorStatus.setText(model.getAuthorStatus());
         holder.commentBody.setText(model.getCommentText());
 
-        //Loading the child comments
+        //Loading the child comments and
+        //filling the child recyclerView
 
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(context);
         holder.childCommentsView.setLayoutManager(layoutManager);
@@ -105,6 +111,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.childCommentsView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
 
+        //Setting up the response functionality.
         holder.respondButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

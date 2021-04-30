@@ -29,7 +29,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-/*This is the main fragment, it displays the most recent popular news, fetched from NewsAPI*/
+/**This is the main fragment, it displays the most recent popular news, fetched from NewsAPI**/
 
 public class NewsFragment extends Fragment {
 
@@ -78,6 +78,8 @@ public class NewsFragment extends Fragment {
     }
 
     //This function fetches the articles from NewsAPI and sends them to the adapter
+    //It gets the data from NewsAPI as a json data, that is unpacked and sent
+    //to the adapter for display
     public void loadJson(){
         ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
         Call<News> call;
@@ -89,7 +91,7 @@ public class NewsFragment extends Fragment {
                 if(response.isSuccessful() && response.body().getArticles() != null){
                     adapter.addItems(response.body().getArticles());
                     adapter.notifyDataSetChanged();
-                    page++;
+                    page++;  //The page variable is used not load the same articles each time
                 }else{
                     Toast.makeText(getActivity(), R.string.noResult, Toast.LENGTH_LONG).show();
                 }

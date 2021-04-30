@@ -29,6 +29,9 @@ import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+/**This fragment is where the user can create new comments
+ * It is very minimalistic, but functional**/
+
 public class CommentFragment extends Fragment {
 
     private String URL;
@@ -71,6 +74,7 @@ public class CommentFragment extends Fragment {
                     commentData.put("CommentBody", commentText.getText().toString());
                     commentData.put("AuthorID", user.getUid());
 
+                    //This is where we upload the new comment
                     collection.add(commentData)
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override

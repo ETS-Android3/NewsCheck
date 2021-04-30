@@ -63,6 +63,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**This fragment is the one shown when the user clicks on
+ * an article. It shows a cardView to access the article in the
+ * article in the default browser, and loads the rating and comments
+ * that have been posted on the article.
+ *
+ * A timer is used in order to make sure the user has read the article
+ * before commenting or rating it. The user currently can only comment
+ * or rate the article one minute after having opened it
+ *
+ * This fragments is also where the user can rate an article and comment on it,
+ * using a ratingBar, and a comment system.**/
+
 public class ArticleFragment extends Fragment {
 
     private String URL;
