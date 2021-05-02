@@ -99,15 +99,14 @@ public class ArticleFragment extends Fragment {
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-    //Variable used to prevent the user from reacting too fast
+    //Variables used to prevent the user from reacting too fast
     //In less than one minute, we assume that he didn't read the
     //article
-    private boolean canComment = false;
     private final int interval = 60000; // 1 Minute
     private final Handler commentHandler = new Handler();
     private final Runnable runnable = new Runnable(){
         public void run() {
-            canComment = true;
+            ((MainActivity)getActivity()).setCanComment(true);
         }
     };
 
@@ -152,12 +151,15 @@ public class ArticleFragment extends Fragment {
 
         newComment = getView().findViewById(R.id.newComment);
 
+        //We reset the capacity to comment
+        ((MainActivity)getActivity()).setCanComment(false);
+
         //The user clicks on the new comment button
         newComment.setOnClickListener(v -> {
             if(user == null){
                 //If he is not logged in, we say it
                 Toast.makeText(getActivity(), R.string.needToLogin, Toast.LENGTH_LONG).show();
-            }else if(!canComment) {
+            }else if(!((MainActivity)getActivity()).canComment()) {
                 //If the user hasn't been here for long enough
                 Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
             }else{
@@ -190,7 +192,7 @@ public class ArticleFragment extends Fragment {
                             //rating bar. If he did and left it then, we assume
                             //that it is his final rating
                             userRating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-                                if(canComment) {
+                                if(((MainActivity)getActivity()).canComment()) {
                                     //We remove previous tasks if they existed
                                     handler.removeCallbacks(sendRating);
                                     //And we create a new one
@@ -223,6 +225,7 @@ public class ArticleFragment extends Fragment {
 
             //We need the activity up for one minute before the use can comment
             //To make sure that he read the article
+            //We start the timer here
             commentHandler.postDelayed(runnable, interval);
         });
 

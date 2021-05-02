@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     This can be the article itself*/
     private CollectionReference currentComment;
 
+    //This boolean is used to allow the user to comment
+    //It is declared here to allow every child comment to access it
+    private boolean canComment = false;
+
     DocumentReference docRef;
     DocumentSnapshot document;
 
@@ -226,5 +230,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public FirebaseUser getUser() {
         return user;
+    }
+
+    public boolean canComment() {
+        return canComment;
+    }
+
+    public void setCanComment(boolean canComment) {
+        this.canComment = canComment;
     }
 }

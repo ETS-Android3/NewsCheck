@@ -74,12 +74,15 @@ public class CommentFragment extends Fragment {
                     commentData.put("CommentBody", commentText.getText().toString());
                     commentData.put("AuthorID", user.getUid());
 
+                    sendComment.setEnabled(false);
+
                     //This is where we upload the new comment
                     collection.add(commentData)
                             .addOnFailureListener(new OnFailureListener() {
                                 @Override
                                 public void onFailure(@NonNull Exception e) {
                                     Toast.makeText(getActivity(), R.string.ErrorSendingComment, Toast.LENGTH_LONG).show();
+                                    sendComment.setEnabled(false);
                                 }
                             })
                             .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {

@@ -115,13 +115,15 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.MyCommen
         holder.respondButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(user!=null) {
+                if(user==null) {
+                    Toast.makeText(context, R.string.needToLogin, Toast.LENGTH_LONG).show();
+                }else if(((MainActivity)context).canComment()){
                     ((MainActivity) context).setCurrentComment(model.getParent());
                     //Launch the comment fragment
                     CommentFragment commentFragment = new CommentFragment();
                     ((MainActivity) context).getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
                 }else{
-                    Toast.makeText(context, R.string.needToLogin, Toast.LENGTH_LONG).show();
+                    Toast.makeText(context, R.string.needToStay, Toast.LENGTH_LONG).show();
                 }
             }
         });

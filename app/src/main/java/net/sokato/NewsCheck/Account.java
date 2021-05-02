@@ -66,33 +66,28 @@ public class Account extends AppCompatActivity {
         logoutButton = findViewById(R.id.logoutButton);
         logoutButton.setOnClickListener(v -> AuthUI.getInstance()
                 .signOut(Account.this)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    public void onComplete(@NonNull Task<Void> task) {
-                        //When disconnected, we go back to the main activity
-                        Intent intent = new Intent(Account.this, MainActivity.class);
-                        startActivity(intent);
-                    }
+                .addOnCompleteListener(task -> {
+                    //When disconnected, we go back to the main activity
+                    Intent intent = new Intent(Account.this, MainActivity.class);
+                    startActivity(intent);
                 }));
 
         verifyAccount = findViewById(R.id.requestVerificationButton);
 
         docRef = db.collection("Users").document(user.getUid());
-        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("verified")) {
-                    verifyAccount.setText(R.string.alreadyVerified);
-                    verifyAccount.setClickable(false);
-                    verifyAccount.setEnabled(false);
-                }else if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("submitted")){
-                    verifyAccount.setText(R.string.alreadySubmitted);
-                    verifyAccount.setClickable(false);
-                    verifyAccount.setEnabled(false);
-                }else{
-                    verifyAccount.setOnClickListener(v -> {
-                        dispatchTakePictureIntent();
-                    });
-                }
+        docRef.get().addOnSuccessListener(documentSnapshot -> {
+            if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("verified")) {
+                verifyAccount.setText(R.string.alreadyVerified);
+                verifyAccount.setClickable(false);
+                verifyAccount.setEnabled(false);
+            }else if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("submitted")){
+                verifyAccount.setText(R.string.alreadySubmitted);
+                verifyAccount.setClickable(false);
+                verifyAccount.setEnabled(false);
+            }else{
+                verifyAccount.setOnClickListener(v -> {
+                    dispatchTakePictureIntent();
+                });
             }
         });
 
