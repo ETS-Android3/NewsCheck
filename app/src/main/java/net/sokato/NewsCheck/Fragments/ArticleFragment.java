@@ -153,25 +153,22 @@ public class ArticleFragment extends Fragment {
         newComment = getView().findViewById(R.id.newComment);
 
         //The user clicks on the new comment button
-        newComment.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(user == null){
-                    //If he is not logged in, we say it
-                    Toast.makeText(getActivity(), R.string.needToLogin, Toast.LENGTH_LONG).show();
-                }else if(!canComment) {
-                    //If the user hasn't been here for long enough
-                    Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
-                }else{
-                    //Else, everything is good, we let the use comment on the article
-                    CommentFragment commentFragment;
-                    //Put the comment at the root of the article
-                    ((MainActivity) getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
+        newComment.setOnClickListener(v -> {
+            if(user == null){
+                //If he is not logged in, we say it
+                Toast.makeText(getActivity(), R.string.needToLogin, Toast.LENGTH_LONG).show();
+            }else if(!canComment) {
+                //If the user hasn't been here for long enough
+                Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
+            }else{
+                //Else, everything is good, we let the use comment on the article
+                CommentFragment commentFragment;
+                //Put the comment at the root of the article
+                ((MainActivity) getActivity()).setCurrentComment(db.collection("Articles").document(URL.replace("/", "")).collection("Comments"));
 
-                    //Launch the comment fragment
-                    commentFragment = new CommentFragment();
-                    getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
-                }
+                //Launch the comment fragment
+                commentFragment = new CommentFragment();
+                getActivity().getSupportFragmentManager().beginTransaction().setCustomAnimations(R.anim.right_enter, R.anim.left_exit).replace(R.id.fragment_container, commentFragment).addToBackStack(null).commit();
             }
         });
 
@@ -186,25 +183,22 @@ public class ArticleFragment extends Fragment {
             db.collection("Articles").document(URL.replace("/", "")).collection("Ratings")
                     .document(((MainActivity) getActivity()).getUser().getUid())
                     .get()
-                    .addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-                        @Override
-                        public void onSuccess(DocumentSnapshot documentSnapshot) {
-                            //We check if the user has already rated the article
-                            if(!documentSnapshot.exists()) { //If not
-                                //We use this to see if the user has modified the
-                                //rating bar. If he did and left it then, we assume
-                                //that it is his final rating
-                                userRating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
-                                    if(canComment) {
-                                        //We remove previous tasks if they existed
-                                        handler.removeCallbacks(sendRating);
-                                        //And we create a new one
-                                        handler.postDelayed(sendRating, 2500);
-                                    }else{
-                                        Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
+                    .addOnSuccessListener(documentSnapshot -> {
+                        //We check if the user has already rated the article
+                        if(!documentSnapshot.exists()) { //If not
+                            //We use this to see if the user has modified the
+                            //rating bar. If he did and left it then, we assume
+                            //that it is his final rating
+                            userRating.setOnRatingBarChangeListener((ratingBar, rating, fromUser) -> {
+                                if(canComment) {
+                                    //We remove previous tasks if they existed
+                                    handler.removeCallbacks(sendRating);
+                                    //And we create a new one
+                                    handler.postDelayed(sendRating, 2500);
+                                }else{
+                                    Toast.makeText(getActivity(), R.string.needToStay, Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     });
         }

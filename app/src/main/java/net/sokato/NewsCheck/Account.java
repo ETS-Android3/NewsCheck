@@ -20,9 +20,13 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
@@ -46,6 +50,8 @@ public class Account extends AppCompatActivity {
     private FirebaseUser user;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private StorageReference storageReference = storage.getReference();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference docRef;
 
     String currentPhotoPath;
 
@@ -69,8 +75,25 @@ public class Account extends AppCompatActivity {
                 }));
 
         verifyAccount = findViewById(R.id.requestVerificationButton);
-        verifyAccount.setOnClickListener(v -> {
-          dispatchTakePictureIntent();
+
+        docRef = db.collection("Users").document(user.getUid());
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("verified")) {
+                    verifyAccount.setText(R.string.alreadyVerified);
+                    verifyAccount.setClickable(false);
+                    verifyAccount.setEnabled(false);
+                }else if(documentSnapshot != null && documentSnapshot.exists() && documentSnapshot.getBoolean("submitted")){
+                    verifyAccount.setText(R.string.alreadySubmitted);
+                    verifyAccount.setClickable(false);
+                    verifyAccount.setEnabled(false);
+                }else{
+                    verifyAccount.setOnClickListener(v -> {
+                        dispatchTakePictureIntent();
+                    });
+                }
+            }
         });
 
         //Once again, if the user has an account picture set up
@@ -129,6 +152,12 @@ public class Account extends AppCompatActivity {
         //We store the picture as the user's UID.jpg
         StorageReference imageRef = storageReference.child(user.getUid()+".jpg");
         imageRef.putFile(Uri.fromFile(new File(currentPhotoPath)));
+
+        //Set the variable to indicate that the verification is in progress, and change the button
+        verifyAccount.setText(R.string.alreadySubmitted);
+        verifyAccount.setClickable(false);
+        verifyAccount.setEnabled(false);
+        docRef.update("submitted", true);
     }
 
     //This function is responsible for creating the file in which the picture will be

@@ -187,6 +187,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         HashMap<String, Object> defaultData = new HashMap<>();
         defaultData.put("username", "");
         defaultData.put("accountType", "normal user");
+        defaultData.put("submitted", false);
+        defaultData.put("verified", false);
 
         login.setText(user.getDisplayName());
 

@@ -26,5 +26,8 @@
     <string name="verifyAccount">Verify your account</string>
     <string name="needToStay">You need to look at the article a bit longer before commenting</string>
     <string name="openArticle">Open this article</string>
-    <string name="artclesLoadingFailure">Failed to load articles</string>
+    <string name="articlesLoadingFailure">Failed to load articles</string>
+    <string name="verificationExplain">To verify your account, and have your comments be more trusted, you can use the above button to send us a picture of any document that can prove your status. These are securely sent, and will be deleted after manual review.</string>
+    <string name="alreadyVerified">Your account is already verified</string>
+    <string name="alreadySubmitted">Your account is being verified</string>
 </resources>

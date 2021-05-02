@@ -99,7 +99,7 @@ public class NewsFragment extends Fragment {
 
             @Override
             public void onFailure(Call<News> call, Throwable t) {
-                Toast.makeText(getActivity(), R.string.artclesLoadingFailure, Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), R.string.articlesLoadingFailure, Toast.LENGTH_LONG).show();
             }
         });
     }
