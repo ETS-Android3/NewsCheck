@@ -17,3 +17,7 @@ Then in the app/src/main/res/values folder, there is a keys.xml file.
 It consists of a single string ressource, in which you need to place your API key that you received from NewsAPI.
 
 The project should then be all set up, just compile and run it !
+
+# Screenshots
+
+<img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Home.png" width="310"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Article_stars.png" width="310"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/User.png" width="310">
