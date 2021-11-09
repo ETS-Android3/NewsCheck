@@ -20,4 +20,4 @@ The project should then be all set up, just compile and run it !
 
 # Screenshots
 
-<img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Home.png" width="310"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Article_stars.png" width="310"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/User.png" width="310">
+<img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Home.png" width="290"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/Article_stars.png" width="290"> <img src="https://github.com/BabdCatha/NewsCheck/blob/main/docs/images/User.png" width="290">
